@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="/assets/icon.png">
+  <title>Price - Login</title>
+  <style>
+    @font-face {
+      font-family: rbt;
+      src: url(./assets/fonts/Roboto-Regular.ttf);
+    }
+
+    @font-face {
+      font-family: ms;
+      src: url(./assets/fonts/Montserrat-Light.ttf);
+    }
+
+    * {
+      font-family: ms;
+    }
+
+    body {
+      background-color: #f9f9f9;
+    }
+  </style>
+</head>
+
+<body>
+  <section>
+    <form id="form-login"
+      style="width: 340px;height: 500px;display: flex;flex-direction: column;justify-content: center; margin: auto;border: 1px solid #eee;padding: 10px;background-color: #fff;box-sizing: border-box;">
+      <a href="/" style="margin: 10px auto;">
+        <img src="/assets/img/logo.svg" alt="logo" width="50" height="50">
+      </a>
+      <input style="padding: 10px;margin: 10px;outline: none;border: 1px solid #ddd;" type="email" placeholder="Email"
+        id="email">
+      <input style="padding: 10px; margin: 10px;outline: none;border: 1px solid #ddd;" type="password"
+        placeholder="Senha" id="pass">
+      <button
+        style="padding: 10px;margin: 10px;background: #702e9c; border: 1px solid #702e9c;color:#fff;cursor: pointer;">Entrar</button>
+      <a style="padding: 10px;text-decoration: none;color: #702e9c;font-size: 14px;" href="/register">Ainda não tenho
+        uma conta!</a>
+      <a style="padding: 10px;text-decoration: none;color: #702e9c;font-size: 14px;" href="/recovery">Esqueci a
+        senha!</a>
+  </section>
+</body>
+
+
+<script>
+  // Responsive Mobile
+  if (screen.width <= 414) {
+    document.getElementById('form-login').style.width = '100%';
+    document.getElementById('form-login').style.border = 'none';
+  }
+
+  document.getElementById('form-login').addEventListener('submit', (e) => {
+    e.preventDefault();
+    const email = document.getElementById('email').value;
+    const pass = document.getElementById('pass').value;
+    const data = { email, pass };
+    login(data);
+  });
+
+  async function login(data) {
+    const response = await fetch('/auth', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data)
+    });
+    const json = await response.json();
+
+    if (json.status) {
+      window.location.href = '/profile';
+    } else {
+      alert('Email ou senha inválidos!');
+    }
+  }
+</script>
+
+</html>

@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="/assets/icon.png">
+  <title>Price - Detalhes</title>
+  <style>
+    @font-face {
+      font-family: rbt;
+      src: url(/assets/fonts/Roboto-Regular.ttf);
+    }
+
+    @font-face {
+      font-family: ms;
+      src: url(/assets/fonts/Montserrat-Light.ttf);
+    }
+
+    * {
+      padding: 0;
+      margin: 0;
+      font-family: ms;
+    }
+
+    body {
+      background: #fff;
+    }
+  </style>
+</head>
+
+<body>
+  <header
+    style="position: sticky;top: 0;display: flex;align-items: center;background-color: #fff;padding: 5px;box-shadow: 0 2px 5px 1px #aaa;border-top: 20px solid #0a228d;">
+    <div style="flex: 1;display: flex;align-items: center;justify-content: space-between;">
+      <div style="display: flex;align-items: center;">
+        <img src="/assets/img/bars-solid.svg" alt="menu" width="30" height="30" style="display: none;">
+        <a href="/" style="text-decoration: none;display: flex;align-items: center;margin-left: 10px;">
+          <img src="/assets/img/logo.svg" alt="logo" width="40" height="40">
+          <p style="font-weight: 900; font-size: 18px;color: #fff;">Price</p>
+        </a>
+      </div>
+
+      <div style="display: flex;align-items: center;">
+        <a href="/search"
+          style="background: url(/assets/img/filter-solid.svg) no-repeat center center/20px;cursor: pointer;display: inline-block;height: 30px;width: 70px;border: none #ddd;background-color: none;"></a>
+        <div style="display: flex;align-items: center;">
+          <input type="search" placeholder="Pesquisar" id="inp-search"
+            style="padding: 8px 10px;padding-left: 40px; width: 550px;display: inline-block;height: 30px;border: 1px solid #ddd;outline: none;background: url(/assets/img/search-solid.svg) no-repeat 5px center/20px;background-color: #fff;">
+        </div>
+      </div>
+
+
+      <a href="/login"
+        style="display: inline-flex;align-items: center;justify-content: space-between;cursor: pointer;width: 120px;padding: 10px; border: 1px solid #0a228d;text-decoration: none;background-color: #fff;font-size: 13px;">
+        <img src="/assets/img/user-circle.svg" alt="user" width="20" height="20">
+        <p style="color: #0a228d; text-transform: uppercase;" id="btn-login-label">Fazer login</p>
+      </a>
+    </div>
+  </header>
+
+  <section style="padding: 20px;min-height: 100vh;">
+    <div style="width: 400px; margin: auto;" id="photo-product-container">
+      <div
+        style="width: 100%;height: 160px;background-color: #eee;display: flex;justify-content: center;align-items: center;margin-bottom: 10px;"
+        id="img-photo">
+        <img src="/assets/img/image.svg" alt="image" width="20" height="20" id="img-icon">
+      </div>
+      <div style="display: flex;">
+        <div>
+          <p id="product-title"></p>
+          <div style="display: flex; align-items: center;margin-top: 5px;">
+            <img src="/assets/img/arrow-down-solid.svg" width="20" height="20" id="product-promotional" />
+            <b id="product-price">$ 00</b>
+          </div>
+          <a href="" id="facility-link"
+            style="display: flex; align-items: center;text-decoration: none;margin-top: 10px;color: #000;">
+            <img src='/assets/img/store.svg' alt="store" width="20" height="20" style="margin-right: 5px;" />
+            <p id="facility-name"></p>
+          </a>
+          <p style="margin: 10px 0;" id="product-time">20.09.22</p>
+          <p style="margin-top: 20px;" id="product-description">
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer
+    style="background-color: #eee;border-top: 1px solid #ddd;padding: 10px;display: flex;flex-direction: column;justify-content: center;align-items: center;">
+    <p style="font-size: 14px;">Price &copy 2022 | <a href="#" style="text-decoration: none;color: #000;">Termos de
+        uso</a>
+    </p>
+    <div style="display: none;">
+      <p style="margin-top: 20px;font-size: 14px;">Patrocínios</p>
+      <div style="display: flex;">
+        <div style="width: 40px;height: 40px;border-radius: 100%;background-color: #ddd;margin: 10px;"></div>
+        <div style="width: 40px;height: 40px;border-radius: 100%;background-color: #ddd;margin: 10px;"></div>
+        <div style="width: 40px;height: 40px;border-radius: 100%;background-color: #ddd;margin: 10px;"></div>
+      </div>
+    </div>
+  </footer>
+</body>
+
+<script>
+  document.getElementById('inp-search').addEventListener('focus', () => {
+    window.location.href = '/search';
+  });
+
+  checkSession();
+
+  async function checkSession() {
+    const response = await fetch('/checkauth');
+    const json = await response.json();
+
+    if (!json.status) {
+      document.getElementById('btn-login-label').innerText = 'Meu Perfil';
+    } else {
+      document.getElementById('btn-login-label').innerText = 'Fazer login';
+    }
+  }
+
+  // Get product details
+  getProductInfo();
+  async function getProductInfo() {
+    const url = new URL(window.location.href);
+    const aux = url.pathname.split('/');
+    const id = aux[aux.length - 1];
+
+    const response = await fetch('/productinfo/' + id);
+    const json = await response.json();
+    document.getElementById('product-title').innerText = json.title;
+    document.getElementById('product-price').innerText = '$ ' + json.price;
+    document.getElementById('product-time').innerText = new Date(json.time);
+    document.getElementById('product-description').innerText = json.description;
+    document.getElementById('facility-link').href = '/facility/' + json.user;
+    document.getElementById('img-photo').style.background = `url(${json.photo.url}) no-repeat center center/contain`;
+
+    if (json.photo.url !== '') {
+      document.getElementById('img-icon').style.display = 'none';
+    } else {
+      document.getElementById('img-photo').style.backgroundColor = '#eee';
+    }
+
+
+
+    if (!json.promotional) {
+      document.getElementById('product-promotional').style.display = 'none';
+    }
+
+    getFacilityInfo(json.user);
+  }
+
+  // Get facility info
+  async function getFacilityInfo(id) {
+    const response = await fetch('/facilitypublicinfo/' + id);
+    const json = await response.json();
+    document.getElementById('facility-name').innerText = json.facilityName;
+  }
+
+
+  // Make responsive
+  if (screen.width <= 414) {
+    document.getElementById('inp-search').style.display = 'none';
+    document.getElementById('photo-product-container').style.width = '100%';
+  }
+</script>
+
+</html>

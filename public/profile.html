@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="/assets/icon.png">
+  <title>Price - Perfil</title>
+  <style>
+    @font-face {
+      font-family: rbt;
+      src: url(./assets/fonts/Roboto-Regular.ttf);
+    }
+
+    @font-face {
+      font-family: ms;
+      src: url(./assets/fonts/Montserrat-Light.ttf);
+    }
+
+    * {
+      padding: 0;
+      margin: 0;
+      font-family: ms;
+    }
+
+    body {
+      background: #fff;
+    }
+  </style>
+</head>
+
+<body>
+  <header
+    style="position: sticky;top: 0;display: flex;align-items: center;background-color: #fff;padding: 5px;box-shadow: 0 2px 5px 1px #aaa;border-top: 20px solid #0a228d;">
+    <div style="flex: 1;display: flex;align-items: center;justify-content: space-between;">
+      <div style="display: flex;align-items: center;">
+        <img src="/assets/img/bars-solid.svg" alt="menu" width="30" height="30" style="display: none;">
+        <a href="/" style="text-decoration: none;display: flex;align-items: center;margin-left: 10px;">
+          <img src="./assets/img/logo.svg" alt="logo" width="40" height="40">
+          <p style="font-weight: 900; font-size: 18px;color: #fff;">Price</p>
+        </a>
+      </div>
+
+      <div style="display: flex; align-items: center;text-decoration: none;color: #000;margin-top: 10px;">
+        <img src='/assets/img/store.svg' alt="store" width="20" height="20" style="margin-right: 5px;" />
+        <p>
+          Meu Perfil
+        </p>
+      </div>
+
+
+      <a href="/logout" style="display: inline-flex;align-items: center;padding: 10px;">
+        <img src="/assets/img/sign-out-alt-solid.svg" alt="user" width="30" height="30">
+      </a>
+    </div>
+  </header>
+
+  <div style="display: flex;" id="main-container">
+    <aside style="flex: 0.3;background: #fff;
+        justify-content: center; padding: 10px;height: calc(100vh - 70px);overflow-y: scroll;
+      ">
+      <form style="display: flex; flex-direction: column;" id="form-update-profile">
+        <input style="padding: 10px;margin: 10px;outline: none;border: 1px solid #ddd;" type="text"
+          placeholder="Nome do estabelecimento" id="inp-facility-name">
+        <input style="padding: 10px;margin: 10px;outline: none;border: 1px solid #ddd;" type="text"
+          placeholder="Contacto" id="inp-facility-contact">
+        <p style="margin: 10px;">Tipo de estabelecimento</p>
+        <select style="padding: 10px;margin: 10px;outline: none;border: 1px solid #ddd;"
+          id="select-facility-category"></select>
+        <div style="padding: 10px;margin: 10px;border: 1px solid #ddd;background-color: #ccc;cursor: pointer;"
+          id="get-location-btn">
+          Pegar localização actual
+        </div>
+        <p style="margin-left: 10px;"><small>(N/D)</small></p>
+        <button
+          style="padding: 10px;margin: 10px;background: #702e9c; border: 1px solid #702e9c;color:#fff;cursor: pointer;">Actualizar</button>
+      </form>
+    </aside>
+    <section style="
+        flex: 1;background-color: #f9f9f9;padding: 10px;
+      ">
+      <button id="btn-new-product"
+        style="cursor: pointer;padding: 10px 10px 10px 40px; background: url(./assets/img/plus-solid.svg) no-repeat 10px center/20px;border: 1px solid #aaa;background-color: #eee;">
+        Adicionar novo produto
+      </button>
+
+      <div id="products"
+        style="margin-top: 20px;display: grid;grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));grid-gap: 20px;height: calc(100vh - 130px);overflow-y: scroll;">
+      </div>
+    </section>
+  </div>
+
+  <div
+    style="position: fixed; top: 0;left: 0;background-color: #fff;width: 100%;height: 100vh;background-color: rgba(0, 0, 0, 0.404);display: none;justify-content: center;align-items: center;overflow-y: scroll;"
+    id="form-add-product-container">
+    <form action="" id="form-add-product"
+      style="width: 400px;margin:20px auto;display:flex;flex-direction: column;background-color: #fff;box-sizing: border-box;">
+      <div id="add-product-photo"
+        style="width: 100%; height: 160px;background-color: #f9f9f9;display: flex;justify-content: center;align-items: center;">
+        <img src="./assets/img/image.svg" alt="image" width="20" height="20" id="photo-o">
+      </div>
+      <div style="padding: 10px;">
+        <input
+          style="box-sizing:border-box;padding: 10px; margin: 10px auto;width: 100%;border: 1px solid #ddd;outline: none;"
+          type="text" id="inp-add-product-title" placeholder="Título">
+        <input
+          style="box-sizing:border-box;padding: 10px; margin: 10px auto;width: 100%;border: 1px solid #ddd;outline: none;"
+          type="number" placeholder="Preço" id="inp-add-product-price" min="1">
+        <div style="display: flex;align-items: center;margin: 5px;">
+          <input type="checkbox" id="promotional">
+          <label style="margin-left: 5px;font-size: 12px;" for="promotional">Promocional</label>
+        </div>
+        <p style="margin: 10px 5px;font-size: 14px;">Categoria do producto</p>
+        <select style="padding: 10px;margin: 10px auto;outline: none;border: 1px solid #ddd;display: block;width: 100%;"
+          id="select-product-category"></select>
+        <input
+          style="box-sizing:border-box;padding: 10px; margin: 10px auto;width: 100%;border: 1px solid #ddd;outline: none;"
+          type="text" placeholder="Descrição" id="inp-add-product-description">
+        <button
+          style="padding: 10px;margin: 10px auto;display: block;width: 100%;background: #702e9c; border: 1px solid #702e9c;color:#fff;text-align: center;cursor: pointer;">Adicionar
+        </button>
+
+        <p id="btn-cancel"
+          style="display: inline-block;padding: 10px;margin: 10px auto;display: block;background: #fff; border: 1px solid #702e9c;color:#702e9c;text-align: center;cursor: pointer;">
+          Cancelar
+        </p>
+
+      </div>
+    </form>
+  </div>
+
+  <footer style=" background-color: #eee;border-top: 1px solid #ddd;padding: 10px;display: flex;flex-direction:
+          column;justify-content: center;align-items: center;">
+    <p style="font-size: 14px;">Price &copy 2022 | <a href="#" style="text-decoration: none;color: #000;">Termos de
+        uso</a>
+    </p>
+    <div style="display: none;">
+      <p style="margin-top: 20px;font-size: 14px;">Patrocínios</p>
+      <div style="display: flex;">
+        <div style="width: 40px;height: 40px;border-radius: 100%;background-color: #ddd;margin: 10px;"></div>
+        <div style="width: 40px;height: 40px;border-radius: 100%;background-color: #ddd;margin: 10px;"></div>
+        <div style="width: 40px;height: 40px;border-radius: 100%;background-color: #ddd;margin: 10px;"></div>
+      </div>
+    </div>
+  </footer>
+</body>
+
+<!-- SCRIPTS  -->
+<script src="./js/CONFIG.js"></script>
+<script>
+  // Delete product
+  async function deleteProduct(id) {
+    const response = await fetch('/delete/' + id);
+    const json = await response.json();
+    console.log(json);
+    getFacilityProducts();
+  }
+
+  document.getElementById('form-add-product-container').addEventListener('click', e => {
+    if (e.target.id == 'form-add-product-container') {
+      document.getElementById('form-add-product-container').style.display = 'none';
+    }
+  });
+
+  document.getElementById('btn-new-product').addEventListener('click', () => {
+    if (profileIsComplete()) {
+      document.getElementById('form-add-product-container').style.display = 'flex';
+    } else {
+      alert('Preencha primeiramente os dados do estabelecimento!');
+    }
+  });
+
+  let promotional = false;
+  document.getElementById('promotional').addEventListener('change', (e) => {
+    promotional = !promotional;
+  });
+
+  // Check if all profile info is set
+  function profileIsComplete() {
+    const facilityName = document.getElementById('inp-facility-name').value;
+    const facilityContact = document.getElementById('inp-facility-contact').value;
+    const facilityCategory = document.getElementById('select-facility-category').value;
+
+    return facilityName !== '' && facilityContact !== '';
+  }
+
+  let productFile = {};
+
+  // Upload profile pic
+  document.getElementById('add-product-photo').addEventListener('click', () => {
+    let files = [];
+    let reader;
+
+    let input = document.createElement('input');
+    input.type = 'file';
+
+
+    input.onchange = e => {
+      files = e.target.files;
+      reader = new FileReader();
+      reader.onload = async () => {
+        document.getElementById('photo-o').clientWidth = '100%';
+        document.getElementById('add-product-photo').style.background = `url(${reader.result}) no-repeat center center/cover`;
+        const ext = files[0].type.split('/')[1];
+
+        productFile = files;
+        // const fileName = new Date().getTime() + '-' + userId + '.' + ext;
+        // var uploadTask = firebase.storage().ref('photos/' + fileName).put(files[0]);
+        // uploadTask.on('state_changed', function (snapshot) {
+
+        // }, function (err) {
+
+        // }, function () {
+        //   uploadTask.snapshot.ref.getDownloadURL().then(async function (url) {
+        //     let photoUrl = await url;
+        //     const data = { url: photoUrl };
+        //     console.log(data);
+        //     const response = await fetch('/updatePhotoUrl', {
+        //       method: 'POST',
+        //       headers: {
+        //         'Content-Type': 'application/json',
+        //       },
+        //       body: JSON.stringify(data)
+        //     });
+        //   });
+        // });
+      }
+      reader.readAsDataURL(files[0]);
+    }
+
+    input.click();
+
+  });
+
+  // Add product
+  document.getElementById('form-add-product').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const title = document.getElementById('inp-add-product-title').value;
+    const price = document.getElementById('inp-add-product-price').value;
+    const description = document.getElementById('inp-add-product-description').value;
+    const productCategory = document.getElementById('select-product-category').value;
+
+    const product = { title, price, description, promotional, photo: { url: '' }, productCategory };
+    const response = await fetch('/addproduct', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(product)
+    });
+    const json = await response.json();
+    if (json.status) {
+      // alert('Producto adicionado com sucesso!');
+      getFacilityProducts();
+      document.getElementById('form-add-product-container').style.display = 'none';
+    }
+  });
+
+  document.getElementById('btn-cancel').addEventListener('click', () => {
+    document.getElementById('form-add-product-container').style.display = 'none';
+  });
+
+  // Update user profile
+  let userLocation = {};
+  // get location
+  document.getElementById('get-location-btn').addEventListener('click', () => {
+    navigator.geolocation.getCurrentPosition(async pos => {
+      userLocation.lat = pos.coords.latitude;
+      userLocation.long = pos.coords.longitude;
+      const response = await fetch('/updateuserlocation', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(userLocation)
+      });
+      const json = await response.json();
+
+    });
+  });
+
+  document.getElementById('form-update-profile').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const facilityName = document.getElementById('inp-facility-name').value;
+    const facilityContact = document.getElementById('inp-facility-contact').value;
+    const facilityCategory = document.getElementById('select-facility-category').value;
+
+    const profile = { facilityName, facilityContact, facilityCategory, userLocation };
+
+    const response = await fetch('/updateprofile', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(profile)
+    });
+    const json = await response.json();
+
+    if (json.status) {
+      alert('Perfil actualizado!');
+    }
+  });
+
+  // Get facility categories
+  let fc = '';
+  CONFIG.facilityCategories.forEach(c => {
+    fc += `<option value="${c.id}">${c.label}</option>`;
+  });
+
+  document.getElementById('select-facility-category').innerHTML = fc;
+
+  // Get product categories
+  let pc = '';
+  CONFIG.productCategories.forEach(c => {
+    pc += `<option value="${c.id}">${c.label}</option>`;
+  });
+
+  document.getElementById('select-product-category').innerHTML = pc;
+
+  // Get profile info
+  getFacilityInfo()
+  async function getFacilityInfo() {
+    const response = await fetch('/facilityinfo');
+    const json = await response.json();
+    console.log(json);
+    document.getElementById('inp-facility-name').value = json.facilityName != undefined ? json.facilityName : '';
+    document.getElementById('inp-facility-contact').value = json.facilityContact != undefined ? json.facilityContact : '';
+    document.getElementById('select-facility-category').value = json.facilityCategory != undefined ? json.facilityCategory : '0';
+  }
+
+  // Get user products
+  getFacilityProducts()
+  async function getFacilityProducts() {
+    const response = await fetch('/facilityproducts');
+    const json = await response.json();
+    console.log(json);
+    let products = '';
+
+    for (let i = 0; i < json.length; i++) {
+      products += `
+    <div style="margin-bottom: 20px;background-color: #fff;height: 260px;">
+      <div
+        style="width: 100%;height: 140px;margin-bottom: 10px;display: flex;justify-content: center;align-items: center;background: url(${json[i].photo.url}) no-repeat center center/100px;background-color: #eee;">
+        <img src="/assets/img/image.svg" alt="image" width="20" height="20"
+          style="display: ${json[i].photo.url == '' ? 'block' : 'none'};"
+        >
+      </div>
+      <div style="padding: 5px;">
+        <p style="height: 40px;">${json[i].title}</p>
+        <p><b>$ ${json[i].price}</b></p> 
+      </div>
+      <div style="display:flex;">
+        <a href="/delete/${json[i]._id}" style="text-decoration:none;color: #666;display:flex;align-items:center;margin-right: 5px;">
+          <img src='./assets/img/trash-solid.svg' width="20" height="20" style="cursor: pointer;" />
+          <p>Remover</p>
+        </a>
+        <a href="/edit/${json[i]._id}" style="text-decoration:none;color: #666;display:flex;align-items:center;margin-right: 5px;">
+          <img style='cursor: pointer;' src='./assets/img/edit.svg' width="20" height="20" />
+          <p>Editar</p>
+        </a>
+      </div>
+    </div>
+  `;
+    }
+
+    document.getElementById('products').innerHTML = products;
+  }
+
+  // Responsive Mobile
+  if (screen.width <= 414) {
+    document.getElementById('main-container').style.flexDirection = 'column';
+    document.querySelector('aside').style.borderBottom = '1px solid #ccc';
+    document.getElementById('form-add-product-container').style.overflowY = 'scroll';
+    document.getElementById('form-add-product-container').style.justifyContent = 'flex-start';
+    document.getElementById('form-add-product-container').style.alignItems = 'flex-start';
+    document.getElementById('form-add-product-container').style.backgroundColor = '#fff';
+  }
+</script>
+
+</html>

@@ -1,0 +1,21 @@
+{
+  "name": "price-v-web",
+  "version": "1.0.0",
+  "description": "A web application to take all stores in one place!",
+  "main": "index.js",
+  "dependencies": {
+    "cookie-parser": "^1.4.5",
+    "express": "^4.17.1",
+    "firebase": "^9.0.2",
+    "nedb": "^1.8.0",
+    "node-fetch": "^2.6.1",
+    "nodemailer": "^6.6.5"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "start": "node index"
+  },
+  "keywords": [],
+  "author": "Victorino, Sairesse <sairessy@gmail.com>",
+  "license": "MIT"
+}

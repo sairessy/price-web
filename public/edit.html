@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="/assets/icon.png">
+  <title>Price - Editar producto</title>
+  <style>
+    @font-face {
+      font-family: rbt;
+      src: url(/assets/fonts/Roboto-Regular.ttf);
+    }
+
+    @font-face {
+      font-family: ms;
+      src: url(/assets/fonts/Montserrat-Light.ttf);
+    }
+
+    * {
+      padding: 0;
+      margin: 0;
+      font-family: ms;
+    }
+
+    body {
+      background: #fff;
+    }
+  </style>
+</head>
+
+<body>
+
+  <form id="form-add-product"
+    style="width: 400px;margin:20px auto;display:flex;flex-direction: column;background-color: #fff;box-sizing: border-box;">
+    <p style="margin: 10px;"><a href="/profile"
+        style="text-decoration: none; color: #0a228d;font-size: 14px;">Voltar</a></p>
+    <div id="add-product-photo"
+      style="width: 95%; height: 160px;background-color: #f9f9f9;display: flex;justify-content: center;align-items: center;margin: auto;">
+      <img src="/assets/img/image.svg" alt="image" width="20" height="20" id="photo-o">
+    </div>
+    <div style="padding: 10px;">
+      <input
+        style="box-sizing:border-box;padding: 10px; margin: 10px auto;width: 100%;border: 1px solid #ddd;outline: none;"
+        type="text" id="inp-add-product-title" placeholder="Título">
+      <input
+        style="box-sizing:border-box;padding: 10px; margin: 10px auto;width: 100%;border: 1px solid #ddd;outline: none;"
+        type="number" placeholder="Preço" id="inp-add-product-price" min="1">
+      <div style="display: flex;align-items: center;margin: 5px;">
+        <input type="checkbox" id="promotional">
+        <label style="margin-left: 5px;font-size: 12px;" for="promotional">Promocional</label>
+      </div>
+      <p style="margin: 10px 5px;font-size: 14px;">Categoria do producto</p>
+      <select style="padding: 10px;margin: 10px auto;outline: none;border: 1px solid #ddd;display: block;width: 100%;"
+        id="select-product-category"></select>
+      <input
+        style="box-sizing:border-box;padding: 10px; margin: 10px auto;width: 100%;border: 1px solid #ddd;outline: none;"
+        type="text" placeholder="Descrição" id="inp-add-product-description">
+      <button
+        style="padding: 10px;margin: 10px auto;display: block;width: 100%;background: #702e9c; border: 1px solid #702e9c;color:#fff;text-align: center;cursor: pointer;"
+        id="btn-edit">Editar</button>
+      <img src="/assets/img/loader.gif" alt="loading" style="display: none;margin: 10px auto;" id="img-loading">
+    </div>
+  </form>
+
+</body>
+
+<!-- SCRIPTS  -->
+<!-- <script src="https://www.gstatic.com/firebasejs/8.7.1/firebase-app.js"></script> -->
+
+<script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-firestore.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-storage.js"></script>
+
+<script src="/js/CONFIG.js"></script>
+<script>
+
+  // Web app's Firebase configuration
+  const firebaseConfig = {
+    apiKey: "AIzaSyAvps6RnraTAWPjUwWin39uYTfiovm8rYE",
+    authDomain: "price-v-web.firebaseapp.com",
+    projectId: "price-v-web",
+    storageBucket: "price-v-web.appspot.com",
+    messagingSenderId: "757843251146",
+    appId: "1:757843251146:web:34b20c089e3f502a2e8933"
+  };
+
+  // Initialize Firebase
+  firebase.initializeApp(firebaseConfig);
+
+  // Get url param id
+  const url = new URL(window.location.href);
+  const aux = url.pathname.split('/');
+  const productId = aux[aux.length - 1];
+
+  let productFile = [];
+
+  async function uploadProductPhoto(productId) {
+    const files = productFile;
+    if (files.length > 0) {
+      const ext = files[0].type.split('/')[1];
+      const fileName = new Date().getTime() + '-' + productId + '.' + ext;
+
+      var uploadTask = firebase.storage().ref('photos/' + fileName).put(files[0]);
+      uploadTask.on('state_changed', function (snapshot) {
+
+      }, function (err) {
+        console.error(err);
+      }, function () {
+        uploadTask.snapshot.ref.getDownloadURL().then(async function (url) {
+          let photoUrl = await url;
+          const data = { url: photoUrl, productId, fileName };
+          const response = await fetch('/updateproductphoturl', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(data)
+          });
+
+          const json = await response.json();
+          if (json.status) {
+            document.getElementById('img-loading').style.display = 'none';
+            document.getElementById('btn-edit').disabled = false;
+            alert('Producto editado com sucesso!');
+          }
+        });
+      });
+    }
+  }
+
+
+  // Load product pic
+  document.getElementById('add-product-photo').addEventListener('click', () => {
+    let files = [];
+    let reader;
+
+    let input = document.createElement('input');
+    input.type = 'file';
+
+
+    input.onchange = e => {
+      files = e.target.files;
+      reader = new FileReader();
+      reader.onload = async () => {
+        document.getElementById('photo-o').clientWidth = '100%';
+        document.getElementById('add-product-photo').style.background = `url(${reader.result}) no-repeat center center/contain`;
+        productFile = files;
+      }
+      reader.readAsDataURL(files[0]);
+    }
+
+    input.click();
+
+  });
+
+  let promotional = false;
+  document.getElementById('promotional').addEventListener('change', (e) => {
+    promotional = !promotional;
+  });
+
+  // Add product
+  document.getElementById('form-add-product').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    document.getElementById('btn-edit').disabled = true;
+    document.getElementById('img-loading').style.display = 'block';
+    const title = document.getElementById('inp-add-product-title').value;
+    const price = document.getElementById('inp-add-product-price').value;
+    const description = document.getElementById('inp-add-product-description').value;
+    const productCategory = document.getElementById('select-product-category').value;
+
+    const product = { id: productId, title, price, description, promotional, photo: { url: '' }, productCategory };
+
+    const response = await fetch('/editproduct', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(product)
+    });
+    const json = await response.json();
+    if (json.status) {
+      if (productFile.length > 0) {
+        uploadProductPhoto(product.id);
+      } else {
+        document.getElementById('img-loading').style.display = 'none';
+        document.getElementById('btn-edit').disabled = false;
+        // alert('Producto editado com sucesso!');
+      }
+    }
+  });
+
+  // Get product
+  getProduct()
+  async function getProduct() {
+    const url = new URL(window.location.href);
+    const aux = url.pathname.split('/');
+    const id = aux[aux.length - 1];
+
+    const response = await fetch('/product/' + id);
+    const json = await response.json();
+    console.log(json);
+    document.getElementById('inp-add-product-title').value = json.title;
+    document.getElementById('inp-add-product-price').value = json.price;
+    document.getElementById('inp-add-product-description').value = json.description;
+    document.getElementById('select-product-category').value = json.productCategory;
+
+    if (json.photo.url !== '') {
+      document.getElementById('add-product-photo').style.background = `url(${json.photo.url}) no-repeat center center/contain`;
+    }
+
+    // Get product category
+    let pc = '';
+    CONFIG.productCategories.forEach(c => {
+      pc += `<option value="${c.id}">${c.label}</option>`;
+    });
+
+    document.getElementById('select-product-category').innerHTML = pc;
+
+  }
+
+  // Responsive Mobile
+  if (screen.width <= 414) {
+    document.getElementById('form-add-product').style.width = '100%';
+  }
+
+</script>
+
+</html>

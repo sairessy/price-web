@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="/assets/icon.png">
+  <title>Price - Mapa</title>
+  <style>
+    @font-face {
+      font-family: rbt;
+      src: url(./assets/fonts/Roboto-Regular.ttf);
+    }
+
+    @font-face {
+      font-family: ms;
+      src: url(./assets/fonts/Montserrat-Light.ttf);
+    }
+
+    * {
+      padding: 0;
+      margin: 0;
+      font-family: ms;
+    }
+
+    body {
+      background-image: url(/assets/img/searchengin.svg);
+      background-repeat: no-repeat;
+      background-position: center 150px;
+      background-size: 200px;
+      background-color: #f9f9f9;
+    }
+  </style>
+</head>
+
+<body id="body">
+  <header
+    style="position: sticky;top: 0;display: flex;align-items: center;background-color: #fff;padding: 5px;box-shadow: 0 2px 5px 1px #aaa;border-top: 20px solid #0a228d;">
+    <div style="flex: 1;display: flex;align-items: center;justify-content: space-between;">
+      <div style="display: flex;align-items: center;">
+        <img src="/assets/img/bars-solid.svg" alt="menu" width="30" height="30" style="display: none;">
+        <a href="/" style="text-decoration: none;display: flex;align-items: center;margin-left: 10px;" id="logo">
+          <img src="./assets/img/logo.svg" alt="logo" width="40" height="40">
+          <p style="font-weight: 900; font-size: 18px;color: #fff;">Price</p>
+        </a>
+      </div>
+
+      <div style="display: flex;align-items: center;">
+        <button
+          style="background: url(/assets/img/filter-solid.svg) no-repeat 5px center/20px;cursor: pointer;display: inline-block;height: 30px;width: 90px;border: 1px solid #ddd;border-right: none;background-color: #fff;padding-left: 30px;">Filtrar
+        </button>
+        <div style="display: flex;align-items: center;">
+          <input type="search" placeholder="Pesquisar" id="inp-search" autofocus
+            style="padding: 8px 10px;padding-left: 40px; width: 550px;display: inline-block;height: 30px;border: 1px solid #ddd;outline: none;background: url(/assets/img/search-solid.svg) no-repeat 5px center/20px;background-color: #fff;">
+        </div>
+      </div>
+
+
+      <a href="/login" id="link-login"
+        style="display: inline-flex;align-items: center;justify-content: space-between;cursor: pointer;width: 140px;padding: 10px; border: 1px solid #0a228d;text-decoration: none;background-color: #fff;font-size: 13px;">
+        <img src="/assets/img/user-circle.svg" alt="user" width="20" height="20">
+        <p style="color: #0a228d; text-transform: uppercase;" id="btn-login-label">Fazer login</p>
+      </a>
+    </div>
+  </header>
+
+  <section style="padding: 20px;min-height: 100vh;">
+    <div id="products"
+      style="display: grid;grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));grid-gap: 20px;">
+    </div>
+  </section>
+  <!-- <progress style="display: block;margin: auto;margin-bottom: 40px;"></progress> -->
+  <footer
+    style="background-color: #eee;border-top: 1px solid #ddd;padding: 10px;display: flex;flex-direction: column;justify-content: center;align-items: center;">
+    <p style="font-size: 14px;">Price &copy 2022 | <a href="#" style="text-decoration: none;color: #000;">Termos de
+        uso</a>
+    </p>
+    <div style="display: none;">
+      <p style="margin-top: 20px;font-size: 14px;">Patrocínios</p>
+      <div style="display: flex;">
+        <div style="width: 40px;height: 40px;border-radius: 100%;background-color: #ddd;margin: 10px;"></div>
+        <div style="width: 40px;height: 40px;border-radius: 100%;background-color: #ddd;margin: 10px;"></div>
+        <div style="width: 40px;height: 40px;border-radius: 100%;background-color: #ddd;margin: 10px;"></div>
+      </div>
+    </div>
+  </footer>
+</body>
+
+<script src="/js/CONFIG.js"></script>
+<script>
+
+  checkSession();
+
+  async function checkSession() {
+    const response = await fetch('/checkauth');
+    const json = await response.json();
+
+    if (!json.status) {
+      document.getElementById('btn-login-label').innerText = 'Meu Perfil';
+    } else {
+      document.getElementById('btn-login-label').innerText = 'Fazer login';
+    }
+  }
+
+  // Get facility info
+  async function getFacilityInfo(id) {
+    const response = await fetch('/facilitypublicinfo/' + id);
+    const json = await response.json();
+    return json;
+  }
+
+  // Aux functions
+  // Get product category
+  function getProductCategory(id) {
+    const c = CONFIG.productCategories.filter((pcategory) => pcategory.id == id);
+    return c[0];
+  }
+
+
+  document.getElementById('inp-search').addEventListener('keyup', () => {
+    const text = document.getElementById('inp-search').value;
+
+    if (text !== '') {
+      getProducts(text);
+    }
+  });
+  // Get products
+  // getProducts();
+  async function getProducts(text) {
+    const response = await fetch('/searchproduct/' + text);
+    const json = await response.json();
+    if (json.length > 0) {
+      document.getElementById('body').style.backgroundImage = 'none';
+      let products = '';
+      json.forEach(async (product) => {
+        // const hasLocation = Object.keys(product.facilityInfo.facilityLocation).length > 0;
+        const facilityLocation = true ? '' : `(x:0 y: 0)`;
+        products +=
+          `
+      <div style="margin-bottom: 20px;background-color: #0a228d;border: 0px solid #eee;">
+      <div
+         style="width: 100%;height: 140px;margin-bottom: 10px;display: flex;justify-content: center;align-items: center;border-bottom: 1px solid #ddd;background: url(${product.photo.url}) no-repeat center center/100px;background-color: #fff;">
+        <img src="/assets/img/image.svg" alt="image" width="20" height="20" style="display: ${product.photo.url == '' ? 'block' : 'none'}">
+      </div>
+      <div style="display: flex;padding: 5px;">
+        <div style="flex: 1;">
+          <p style="height: 40px;font-size: 14px;font-weight: bold;color: #fff;">${product.title}</p>
+          <div style="display: flex; align-items: center;margin-top: 5px;">
+            <img src="/assets/img/arrow-down-solid.svg" width="20" height="20"
+              style="display: ${product.promotional ? 'inline-block' : 'none'}"
+            />
+            <b style="font-size: 14px;color: #fff;">$ ${product.price}</b>
+          </div>
+
+          <div style="display: flex; align-items: center;">
+            <a href="/facility/${product.user}" style="display: flex; align-items: center;text-decoration: none;color: #000;margin-top: 10px;">
+              <img src='/assets/img/store-alt-solid.svg' alt="store" width="20" height="20" style="margin-right: 5px;" />
+              <p style="color: #fff;">${product.facilityInfo.facilityName}</p>
+            </a>
+          </div>
+          
+        </div>
+        <a href="details/${product._id}" style="display: flex; align-items: center; padding: 5px;">
+          <img src='./assets/img/angle-right-solid.svg' alt='details' width="20" height="20" />
+        </a>
+        </div>
+        <p style="padding: 5px;font-size: 12px;">
+          <a href="/products/category/${getProductCategory(product.productCategory).id}" style="text-decoration: none;color: #fff;">${getProductCategory(product.productCategory).label}</a>
+        </p>
+        <!--<p style="padding: 5px;font-size: 12px;height: 10px;>${facilityLocation}</p>-->
+      </div>`;
+      });
+
+      document.getElementById('products').innerHTML = products;
+    } else {
+      document.getElementById('products').innerHTML = '<div></div>';
+      document.getElementById('body').style.backgroundImage = 'url(/assets/img/searchengin.svg)';
+    }
+
+    return json;
+
+  }
+
+  // Responsive Mobile
+  if (screen.width < 414) {
+    document.querySelector('#link-login').style.display = 'none';
+    document.querySelector('#logo').style.display = 'none';
+    document.getElementById('inp-search').style.width = '100%';
+
+  }
+</script>
+
+</html>
